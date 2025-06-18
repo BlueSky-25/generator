@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+<generatorConfiguration>
+    <!-- 引入配置文件 -->
+    <properties resource="config.properties"></properties>
+
+    <!-- 目标数据库 -->
+    <!-- 一个数据库一个context, context子元素必须按照如下顺序
+        property*、plugin*、commentGenerator?、jdbcConnection、javaTypeResolver?
+        javaModelGenerator、sqlMapGenerator?、javaClientGenerator?、table+
+    -->
+    <!--id : 随便填，保证多个 context id 不重复就行
+        defaultModelType ： 可以不填，默认值 conditional，flat表示一张表对应一个po
+        targetRuntime ：可以不填，默认值 MyBatis3，常用的还有 MyBatis3Simple，这个配置会影响生成的 dao 和 mapper.xml的内容
+        targetRuntime = MyBatis3Simple，生成的 dao 和 mapper.xml，接口方法会少很多，只包含最最常用的
+    -->
+    <context id="Mysql" targetRuntime="MyBatis3" defaultModelType="flat">
+
+        <!-- 自动检查关键字，为关键字增加反引号 -->
+        <property name="autoDelimitKeywords" value="true"/>
+        <property name="beginningDelimiter" value="`"/>
+        <property name="endingDelimiter" value="`"/>
+
+        <!-- 生成的pojo，将implements Serializable -->
+        <plugin type="org.mybatis.generator.plugins.SerializablePlugin"/>
+        <!-- 生成的pojo，增加了equals 和 hashCode方法-->
+        <plugin type="org.mybatis.generator.plugins.EqualsHashCodePlugin"/>
+        <!--覆盖生成XML文件-->
+        <plugin type="org.mybatis.generator.plugins.UnmergeableXmlMappersPlugin"/>
+        <!-- 生成的实体类添加toString()方法 -->
+        <plugin type="org.mybatis.generator.plugins.ToStringPlugin"/>
+
+        <commentGenerator>
+            <!-- 是否去除自动生成的注释 true：是 ： false:否 -->
+            <property name="suppressAllComments" value="true"/>
+            <property name="suppressDate" value="false"/>
+            <!--添加 db 表中字段的注释-->
+            <property name="addRemarkComments" value="true"/>
+        </commentGenerator>
+
+        <!-- 配置数据源，需要根据自己的项目修改 -->
+        <jdbcConnection driverClass="${datasource.driverClassName}"
+                        connectionURL="${datasource.url}"
+                        userId="${datasource.username}"
+                        password="${datasource.password}">
+            <property name="nullCatalogMeansCurrent" value="true"/>
+        </jdbcConnection>
+
+        <javaTypeResolver>
+            <!--类型解析器-->
+            <!-- 默认false，把jdbc decimal 和 numeric 类型解析为integer -->
+            <!-- true，把jdbc decimal 和 numeric 类型解析为java.math.bigdecimal-->
+            <property name="forceBigDecimals" value="false"/>
+            <!--默认false
+                false，将所有 JDBC 的时间类型解析为 java.util.Date
+                true，将 JDBC 的时间类型按如下规则解析
+                   DATE                    -> java.time.LocalDate
+                   TIME                    -> java.time.LocalTime
+                   TIMESTAMP                   -> java.time.LocalDateTime
+                   TIME_WITH_TIMEZONE      -> java.time.OffsetTime
+                   TIMESTAMP_WITH_TIMEZONE    -> java.time.OffsetDateTime
+            -->
+            <property name="useJSR310Types" value="false"/>
+        </javaTypeResolver>
+
+        <!-- domain类的位置 targetProject是相对pom.xml的路径-->
+        <javaModelGenerator targetProject="${generator.outputDir}"
+                            targetPackage="${generator.packageName}.entity">
+            <!-- 是否让schema作为包后缀 默认是false
+              会在 po 目录下在创建一个 “数据库名” 的文件夹，生成的 po 会放在该文件夹下，也就是说会多一层目录
+          -->
+            <property name="enableSubPackages" value="false"/>
+            <!-- 从数据库返回的值被清理前后的空格-->
+            <property name="trimStrings" value="true"/>
+        </javaModelGenerator>
+
+
+        <!-- mapper xml的位置 targetProject是相对pom.xml的路径 -->
+        <sqlMapGenerator targetProject="${generator.outputDir}"
+                         targetPackage="${generator.packageName}.mapper.xml"/>
+
+        <!-- mapper类的位置 targetProject是相对pom.xml的路径 -->
+        <javaClientGenerator targetProject="${generator.outputDir}"
+                             targetPackage="${generator.packageName}.mapper"
+                             type="XMLMAPPER"/>
+
+        <!-- 用于自动生成代码的数据库表；生成哪些表;
+                 schema为数据库名，oracle需要配置，mysql不需要配置。
+                 tableName为对应的数据库表名
+                 domainObjectName 是要生成的实体类名(可以不指定)（其中 domainObjectName 不配置时，它会按照帕斯卡命名法将表名转换成类名）
+                 enableXXXByExample 默认为 true， 为 true 会生成一个对应Example帮助类，帮助你进行条件查询，不想要可以设为false
+                 生成全部表tableName设为 %
+             -->
+<!--        <table tableName="passenger" domainObjectName="Passenger"/>-->
+        <table schema="train" tableName="passenger" domainObjectName="Passenger" enableCountByExample="false"
+               enableDeleteByExample="false" enableSelectByExample="false"
+               enableUpdateByExample="false">
+        </table>
+
+        <table schema="train" tableName="member" domainObjectName="member" enableCountByExample="false"
+               enableDeleteByExample="false" enableSelectByExample="false"
+               enableUpdateByExample="false">
+        </table>
+    </context>
+</generatorConfiguration>
